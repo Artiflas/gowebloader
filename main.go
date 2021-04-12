@@ -9,7 +9,10 @@ import (
 	"path/filepath"
 )
 
-var flagOutput = flag.String("o", "", "file as target")
+var (
+	flagOutput = flag.String("o", "", "file as target")
+	flagHeader = flag.Bool("header", false, "output of the http-header")
+)
 
 func main() {
 	flag.Parse()
@@ -17,6 +20,7 @@ func main() {
 	var w io.Writer
 	// default is Stdout
 	w = os.Stdout
+
 	if len(args) != 1 {
 		fmt.Println("please just one URL")
 		os.Exit(1)
@@ -28,6 +32,7 @@ func main() {
 		os.Exit(2)
 	}
 	defer resp.Body.Close()
+
 	if *flagOutput != "" {
 		path := filepath.Dir(*flagOutput)
 		err := os.MkdirAll(path, 0755)
@@ -43,5 +48,13 @@ func main() {
 		defer fd.Close()
 		w = fd
 	}
+
+	if *flagHeader {
+		fmt.Printf("%#v", resp.Header)
+		for k, v := range resp.Header {
+			fmt.Printf("%s: %v\n\n", k, v)
+		}
+	}
+
 	io.Copy(w, resp.Body)
 }
