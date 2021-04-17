@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 )
@@ -55,6 +56,12 @@ func main() {
 			fmt.Printf("%s: %v\n\n", k, v)
 		}
 	}
-
 	io.Copy(w, resp.Body)
+}
+func validateURL(s string) bool {
+	_, err := url.ParseRequestURI(s)
+	if err != nil {
+		return false
+	}
+	return true
 }
